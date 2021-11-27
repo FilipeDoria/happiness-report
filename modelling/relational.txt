@@ -1,0 +1,20 @@
+﻿Country
+-
+country_name text PK
+region text
+population number
+area number
+infant_mortality nmber
+literacy number
+
+Score
+-
+country_name text FK >- Country.country_name
+GDP money
+happiness_score number
+year date
+
+
+
+#Country (country_name, region, population, area, infant_mortality, literacy)
+#Score (#country_name → Country [NN], GDP, happiness_score, year)

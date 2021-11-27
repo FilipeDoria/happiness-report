@@ -1,0 +1,12 @@
+version: '3.3'
+
+services:
+  postgresql:
+    container_name: mced_fced
+    image: postgres:10
+    environment:
+      POSTGRES_USER: db_report
+      POSTGRES_PASSWORD: db_report
+      POSTGRES_DB: db_report
+    ports:
+      - 5409:5432
