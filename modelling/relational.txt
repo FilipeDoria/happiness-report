@@ -1,4 +1,6 @@
-﻿Country
+﻿#https://app.quickdatabasediagrams.com/#/
+
+Country
 -
 country_name text PK
 region text

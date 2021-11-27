@@ -1,4 +1,4 @@
--- SQL Modellinghttps://app.quickdatabasediagrams.com/#/
+-- SQL Modelling https://app.quickdatabasediagrams.com/#/
 
 CREATE TABLE "Country" (
     "country_name" text   NOT NULL,
