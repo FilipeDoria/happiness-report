@@ -1,7 +1,11 @@
-#  FEUP - Master in Data Science and Engineering
+#  FEUP - Master in Data Science and Engineering 2021
+#  FCED - Databases
+# 
 #  Ana Catarina Mesquita
 #  Filipe Dória
 #  Guilherme Salles
+#
+#  https://dbm.fe.up.pt/phppgadmin/
 
 import psycopg2
 import pandas as pd
@@ -10,7 +14,7 @@ import csv
 # con = psycopg2.connect(
 #    database="fced_guilherme_salles",             # your database is the same as your username
 #    user="fced_guilherme_salles",    # your username admin
-#    password="",             # your password
+#    password="admin",             # your password
 #    host="dbm.fe.up.pt",             # the database host
 #    port="5433",
 #    options='-c search_path=employees'  # use the schema you want to connect to
@@ -67,7 +71,7 @@ def insert_countries_db (con):
 
 
 def insert_countries_pandas_db(con):
-    df = pd.read_csv('./datasets/countries_of_the_world.csv')
+    df = pd.read_csv('countries of the world.csv')
 
     #Correct the missing values per null
     df = df.fillna('Null')
@@ -92,7 +96,7 @@ def insert_countries_pandas_db(con):
     for l in df.itertuples():
         country = l.country_name.strip()
         region = l.region.strip()
-        cur.execute(f"INSERT INTO country VALUES ('{country}','{region}',{l.population},{l.area},{l.population_des},{l.coastline},{l.net_migration},{l.infant_mortality},{l.GDP},{l.literacy},{l.phones},{l.arable},{l.crops},{l.other},{l.climate},{l.birthrate},{l.deathrate},{l.agriculture},{l.industry},{l.service});")
+        cur.execute(f"INSERT INTO country VALUES ('{country}','{region}',{l.population},{l.area},{l.population_des},{l.coastline},{l.net_migration},{l.infant_mortality},{l.literacy},{l.phones},{l.arable},{l.crops},{l.other},{l.climate},{l.birthrate},{l.deathrate},{l.agriculture},{l.industry},{l.service});")
 
     con.commit()
     print(f"3 correction has been made on country name:")
@@ -116,39 +120,38 @@ def rollback_db(con):
 def create_table_country(con):
     cur = con.cursor()
     cur.execute(f"SET search_path to country;")
-    cur.execute(f"CREATE TABLE country (country_name text   NOT NULL, region text ,population int ,area int ,population_des numeric ,coastline numeric ,net_migration numeric  ,infant_mortality numeric ,GDP money   ,literacy numeric ,phones numeric ,arable numeric ,crops numeric ,other numeric ,climate int ,birthrate numeric ,deathrate numeric ,agriculture numeric ,industry numeric ,service numeric , CONSTRAINT pk_Country PRIMARY KEY (country_name ));")
+    cur.execute(f"CREATE TABLE country (country_name text   NOT NULL, region text ,population int ,area int ,population_des numeric ,coastline numeric ,net_migration numeric  ,infant_mortality numeric ,literacy numeric ,phones numeric ,arable numeric ,crops numeric ,other numeric ,climate int ,birthrate numeric ,deathrate numeric ,agriculture numeric ,industry numeric ,service numeric , CONSTRAINT pk_Country PRIMARY KEY (country_name ));")
     con.commit()
 
-def connect_to_local_dbm():
-    conn = psycopg2.connect(
-        dbname="db_report",  # your database is the same as your username
-        user="db_report",  # your username admin
-        password="db_report",  # your password
-        host="localhost",  # the database host
-        options='-c search_path=country',  # use the schema you want to connect to
-        port=5409
-    )
-    return conn
+def connect_local():
+    con = psycopg2.connect(
+         database="db_report",  # your database is the same as your username
+         user="db_report",  # your username admin
+         password="db_report",  # your password
+         host="localhost",  # the database host
+         port="5409", # the defined database port
+         options='-c search_path=country'  # use the schema you want to connect to
+     )
+    print(f"Establishing connection with local database...")
+    return con
 
-
-def connect_to_feup_dbm():
-    conn = psycopg2.connect(
-        dbname="fced_filipe_oria",  # your database is the same as your username
-        user="fced_filipe_oria",  # your username admin
-        password="oria",  # your password
+def connect_feup():
+    con = psycopg2.connect(
+        database="fced_guilherme_salles",  # your database is the same as your username
+        user="fced_guilherme_salles",  # your username admin
+        password="admin",  # your password
         host="dbm.fe.up.pt",  # the database host
-        options='-c search_path=country',  # use the schema you want to connect to
-        port=5433
+        port="5433",
+        options='-c search_path=country'  # use the schema you want to connect to
     )
-    return conn
-
-# update to the correct dbm instance
-conn = connect_to_local_dbm()
+    print(f"Establishing connection with Feup database...")
+    return con
 
 if __name__ == "__main__":
 
+    #conn = connect_feup()
+    conn = connect_local()
     print(f"Starting to load countries dataset to database...")
-
     print("Cleaning old records...")
 
     try:
@@ -170,8 +173,8 @@ if __name__ == "__main__":
 
     try:
         insert_countries_pandas_db(conn)
-
         print("Import data operation concluded successfully!")
+
     except psycopg2.errors.InFailedSqlTransaction:
         print('ALERT: Failed to insert data!')
         print('Import data operation canceled!')

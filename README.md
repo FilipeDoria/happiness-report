@@ -1,64 +1,76 @@
-# happiness-report
-DB report with world happiness dataset
 
-The project directory is organized in folder concerning each topic of the report.
+# World Happiness Report - Databases Practical Assignment
 
-/datasets -> for the raw datasets to work with
+Ana Catarina Mesquita
 
-/modelling -> for the modelling exercise
+Filipe Dória
 
-/python -> for the python scripts exercises
+Guilherme Salles
 
-/database -> for the database exercise
+# 1) Download Files and Intro
+Please READ the instructions and information below in order to execute correctly the files:
+In order for the python script files to work correctly all the csv must be on the same folder than the .py files.
 
-/outputs -> for the extra exercise outputs
-
-# 1) Download Files.
-a) Download the world-happiness dataset from here. Save the five files (one per year
-as "wh-2015.csv, wh-2016.csv, wh-2017.csv, wh-2018.csv, wh-2019.csv"). This
-dataset contains results from a world annual survey about the state of global
-happiness.
-
-b) Download the countries-of-the-world ("countries of the world.csv") dataset from here.
-This dataset has static data about the population, area, coastline, migration, infant
-mortality, GDP, and literacy.
+Also, it was created a schema on the database called "country", during the setup connection it is necessary to direct the connection to this schema. So, please make sure that you have this created before running the scripts files.
 
 
-# Modelling Exercise
-a) Draw a UML diagram of a database capable of holding data about each country’s
-population, area, infant mortality, GDP, and literacy, and the score column of the
-world-happiness (uml.png).
+If you move the files, also create a folder called "output". This will be the folder where the scripts will generate the output.
 
-b) Convert this diagram into the relational model (relational.txt).
+# 2) Design the Database
 
-c) Write a SQL script that creates the database (happiness.sql).
+**#Country** (country_name, region, population, area, population_des, coastline, net_migration, infant_mortality, literacy, phones, arable, crops, other, climate, birthrate, deathrate, agriculture, industry, service)
 
-d) Create the corresponding tables in your PostgreSQL database.
+**#Score** (#country_name → Country [NN], gdp, happiness_score, year)
+
+![alt text](uml.png)
+
+*To setup the files and make the SQL Insert on any server, please verify the function called "connection_feup" or "connection_local" and adjust the parameters for the correct database that it will be used.*
+
+# 3) Prepare Data
+
+## compare-countries .py
+In this script, it was created a function to compare words in two lists. In the first list it will be verified that the same item will not exist on the second (don't exist in same letters).
+
+So, using this function, we make the comparison between the world happiness list from one year with world list countries. If we don't find those countries we should register them separately in order for it to be handled.
+
+The script goes over a loop (2015-2019) and generates a .txt file on the folder output (output-compare-countries) with countries that were not found in each year.
+
+*Note: Make sure that all 6 .csv are on the same folder of the script and that it has a folder called "output".*
+
+# 4) Load Data
+## load_countries_of_the_world.py
+We start by connecting to a specific database, and performing an insert with the data of the countries of "countries of the world.csv" on the table country.  
+The script deletes previous data on this table called "country" and performs the insert.
+
+In this script it was corrected the name of 3 countries that were using special characters.
+
+*Note: Make sure that all the .csv files are on the same folder of the script and that the database has a schema called "country".*
+
+---
+## load_happiness.py
+Connection to the database, and perform the insert of the data from each year from the .csv files "wh-year.csv" on the table score. 
+
+The script deletes previous data on this table score from the specific year and performs the data insertion. A few more country names were also corrected.
+
+In the same script, it is necessary to pass 2 arguments when executing the .py file.
+*E.G. python "load_happiness.py" and [YEAR] [CSV File].* 
+> $python load_happiness.py 2015 wh-2015.csv
+
+*Note: Make sure that the .csv is on the same folder of the script and that the database has a schema called "country".*
+
+# 5) SQL Questions 
+
+This exercise is written on question.sql
 
 
-![alt text](modelling/uml.png)
+# 6) Extra_report.py - Statistical Data Analysis
 
-# 3) Prepare Data.
-a) You noticed that some countries do not have the same name in both datasets. Write
-a Python script (compare-countries.py) that reads the world-happiness dataset files
-and compares each country's name against the countries-of-the-world dataset. If a
-country in the world-happiness dataset does not exist in the countries-of-the-world
-dataset, write that country to the console to be corrected/removed (manually or using
-another Python script).
+Execute the Statistical Data Analysis and produce an automated report for reading
 
-# 4) Load Data.
-a) Create a Python script (load_countries_of_the_world.py) that:
+> $ python3 extra_report.py 
 
-    i) removes all data from the database (using the DELETE command),
+This extra script accesses the data on .csv files and generates a .html report with graphs and tables, and saves the PNG's that the graph's generates from the script.
 
-    ii) reads the countries of the world.csv file, and
+*Additionally if no report page as opened automatically in your browser, check the file on the folder output, "output_report_extra.html" to verify in detail the report.*
 
-    iii) populates the database with new data (using the INSERT command).
-
-b) Create a Python script (load_happiness.py) that:
-
-    i) removes all happiness data from the database for a certain year (passed as an argument)
-    
-    ii) reads data from one of the world-happiness datasets files (passed as an argument), and
-    
-    iii) populates the database with data from that file and year.
+*Note: Make sure that the .csv is on the same folder of the script and it has a folder called "output".*

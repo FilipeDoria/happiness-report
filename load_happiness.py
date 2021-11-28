@@ -2,6 +2,7 @@
 #  Ana Catarina Mesquita
 #  Filipe Dória
 #  Guilherme Salles
+#https://dbm.fe.up.pt/phppgadmin/
 
 import pandas as pd
 import psycopg2
@@ -97,6 +98,30 @@ def create_table_score(con):
     cur.execute(f"ALTER TABLE score ADD CONSTRAINT fk_Score_country_name FOREIGN KEY(country_name) REFERENCES country (country_name);")
     con.commit()
 
+def connect_local():
+    con = psycopg2.connect(
+         database="db_report",  # your database is the same as your username
+         user="db_report",  # your username admin
+         password="db_report",  # your password
+         host="localhost",  # the database host
+         port=5409, #your database access port 
+         options='-c search_path=country'  # use the schema you want to connect to
+     )
+    print(f"Establishing connection with local database...")
+    return con
+
+def connect_feup():
+    con = psycopg2.connect(
+        database="fced_guilherme_salles",  # your database is the same as your username
+        user="fced_guilherme_salles",  # your username admin
+        password="admin",  # your password
+        host="dbm.fe.up.pt",  # the database host
+        port="5433",
+        options='-c search_path=country'  # use the schema you want to connect to
+    )
+    print(f"Establishing connection with Feup database...")
+    return con
+
 
 if __name__ == "__main__":
 #for year in ([2015,2016,2017,2018,2019]):
@@ -104,20 +129,16 @@ if __name__ == "__main__":
     year = int(sys.argv[1])
     csv_file =  str(sys.argv[2])
 
-    #year = 2015
     #csv_file = f"wh-{year}.csv"
 
     if year != int(csv_file[3:7]):
-        print('\nWarning:Values inserted as arguments are invalid, please check it\n')
+        print('\nWarning:Values inserted as arguments has a different year, please check it\n')
+        csv_file = f"wh-{year}.csv"
+        print(f"\nWarning:The program wil consider the year {year} for proceed with importation\n")
 
-    conn = psycopg2.connect(
-        database="sandbox",  # your database
-        user="postgres",  # your username admin
-        password="postgres",  # your password
-        host="localhost",  # the database host
-        options='-c search_path=country'  # use the schema you want to connect to
-    )
 
+    #conn = connect_feup()
+    conn = connect_local()
     print(f"\nStarting to load happiness dataset {year} to database...")
 
     print("Cleaning old records...")
@@ -133,7 +154,7 @@ if __name__ == "__main__":
     import_happiness_year(conn,year,csv_file)
     print_country_corrected(year)
 
-    print("Import data operation concluded successfully!")
+    print(f"Import data from {year} concluded successfully!")
 
 
 
